@@ -51,6 +51,7 @@ export const ProfileViewer = forwardRef<ProfileViewerRef, Props>(
         desc: "",
         url: "",
         option: {
+          stop_updating: false,
           with_proxy: false,
           self_proxy: false,
         },
@@ -249,6 +250,16 @@ export const ProfileViewer = forwardRef<ProfileViewerRef, Props>(
 
         {isRemote && (
           <>
+            <Controller
+              name="option.stop_updating"
+              control={control}
+              render={({ field }) => (
+                <StyledBox>
+                  <InputLabel>{t("Stop Updating")}</InputLabel>
+                  <Switch checked={field.value} {...field} color="primary" />
+                </StyledBox>
+              )}
+            />
             <Controller
               name="option.with_proxy"
               control={control}

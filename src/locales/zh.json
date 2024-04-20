@@ -69,6 +69,7 @@
   "Descriptions": "描述",
   "Subscription URL": "订阅链接",
   "Update Interval": "更新间隔",
+  "Stop Updating": "停止更新",
   "Use System Proxy": "使用系统代理更新",
   "Use Clash Proxy": "使用Clash代理更新",
   "Accept Invalid Certs (Danger)": "允许无效证书 (危险)",

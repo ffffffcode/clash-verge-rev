@@ -77,6 +77,11 @@ pub struct PrfOption {
     pub user_agent: Option<String>,
 
     /// for `remote` profile
+    /// stop updating
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stop_updating: Option<bool>,
+
+    /// for `remote` profile
     /// use system proxy
     #[serde(skip_serializing_if = "Option::is_none")]
     pub with_proxy: Option<bool>,

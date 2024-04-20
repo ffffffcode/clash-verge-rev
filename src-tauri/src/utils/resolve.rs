@@ -242,6 +242,7 @@ pub async fn resolve_scheme(param: String) {
         .trim_start_matches("clash://install-config?url=");
     let option = PrfOption {
         user_agent: None,
+        stop_updating: None,
         with_proxy: Some(true),
         self_proxy: None,
         danger_accept_invalid_certs: None,

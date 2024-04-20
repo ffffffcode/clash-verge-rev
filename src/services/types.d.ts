@@ -174,6 +174,7 @@ interface IProfileItem {
 
 interface IProfileOption {
   user_agent?: string;
+  stop_updating?: boolean;
   with_proxy?: boolean;
   self_proxy?: boolean;
   update_interval?: number;

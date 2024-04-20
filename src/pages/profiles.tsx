@@ -224,7 +224,10 @@ const ProfilePage = () => {
       setLoadingCache((cache) => {
         // 获取没有正在更新的订阅
         const items = regularItems.filter(
-          (e) => e.type === "remote" && !cache[e.uid]
+          (e) =>
+            e.type === "remote" &&
+            !cache[e.uid] &&
+            e.option?.stop_updating === false
         );
         const change = Object.fromEntries(items.map((e) => [e.uid, true]));
 
