@@ -182,9 +182,13 @@ impl Tray {
             #[cfg(target_os = "macos")]
             let mut icon = include_bytes!("../../icons/mac-tray-icon-sys.png").to_vec();
             if *sysproxy_tray_icon {
-                let path = dirs::app_home_dir()?.join("icons").join("sysproxy.png");
-                if path.exists() {
-                    icon = std::fs::read(path).unwrap();
+                let icon_dir_path = dirs::app_home_dir()?.join("icons");
+                let png_path = icon_dir_path.join("sysproxy.png");
+                let ico_path = icon_dir_path.join("sysproxy.ico");
+                if ico_path.exists() {
+                    icon = std::fs::read(ico_path).unwrap();
+                } else if png_path.exists() {
+                    icon = std::fs::read(png_path).unwrap();
                 }
             }
             icon
@@ -194,9 +198,13 @@ impl Tray {
             #[cfg(target_os = "macos")]
             let mut icon = include_bytes!("../../icons/mac-tray-icon.png").to_vec();
             if *common_tray_icon {
-                let path = dirs::app_home_dir()?.join("icons").join("common.png");
-                if path.exists() {
-                    icon = std::fs::read(path).unwrap();
+                let icon_dir_path = dirs::app_home_dir()?.join("icons");
+                let png_path = icon_dir_path.join("common.png");
+                let ico_path = icon_dir_path.join("common.ico");
+                if ico_path.exists() {
+                    icon = std::fs::read(ico_path).unwrap();
+                } else if png_path.exists() {
+                    icon = std::fs::read(png_path).unwrap();
                 }
             }
             icon
@@ -208,9 +216,13 @@ impl Tray {
             #[cfg(target_os = "macos")]
             let mut icon = include_bytes!("../../icons/mac-tray-icon-tun.png").to_vec();
             if *tun_tray_icon {
-                let path = dirs::app_home_dir()?.join("icons").join("tun.png");
-                if path.exists() {
-                    icon = std::fs::read(path).unwrap();
+                let icon_dir_path = dirs::app_home_dir()?.join("icons");
+                let png_path = icon_dir_path.join("tun.png");
+                let ico_path = icon_dir_path.join("tun.ico");
+                if ico_path.exists() {
+                    icon = std::fs::read(ico_path).unwrap();
+                } else if png_path.exists() {
+                    icon = std::fs::read(png_path).unwrap();
                 }
             }
             indication_icon = icon
@@ -249,18 +261,30 @@ impl Tray {
             map
         };
 
+        let mut current_profile_name = "None".to_string();
+        let profiles = Config::profiles();
+        let profiles = profiles.latest();
+        if let Some(current_profile_uid) = profiles.get_current() {
+            let current_profile = profiles.get_item(&current_profile_uid);
+            current_profile_name = match &current_profile.unwrap().name {
+                Some(profile_name) => profile_name.to_string(),
+                None => current_profile_name,
+            };
+        };
         let _ = tray.set_tooltip(&format!(
-            "Clash Verge {version}\n{}: {}\n{}: {}",
+            "Clash Verge {version}\n{}: {}\n{}: {}\n{}: {}",
             t!("System Proxy", "系统代理"),
             switch_map[system_proxy],
             t!("TUN Mode", "Tun 模式"),
-            switch_map[tun_mode]
+            switch_map[tun_mode],
+            t!("Curent Profile", "当前订阅"),
+            current_profile_name
         ));
 
         Ok(())
     }
 
-    pub fn on_left_click(app_handle: &AppHandle) {
+    pub fn on_click(app_handle: &AppHandle) {
         let tray_event = { Config::verge().latest().tray_event.clone() };
         let tray_event = tray_event.unwrap_or("main_window".into());
         match tray_event.as_str() {
@@ -273,7 +297,10 @@ impl Tray {
 
     pub fn on_system_tray_event(app_handle: &AppHandle, event: SystemTrayEvent) {
         match event {
-            SystemTrayEvent::LeftClick { .. } => Tray::on_left_click(app_handle),
+            #[cfg(not(target_os = "macos"))]
+            SystemTrayEvent::LeftClick { .. } => Tray::on_click(app_handle),
+            #[cfg(target_os = "macos")]
+            SystemTrayEvent::RightClick { .. } => Tray::on_click(app_handle),
             SystemTrayEvent::MenuItemClick { id, .. } => match id.as_str() {
                 mode @ ("rule_mode" | "global_mode" | "direct_mode") => {
                     let mode = &mode[0..mode.len() - 5];
