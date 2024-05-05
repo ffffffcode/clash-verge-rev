@@ -49,12 +49,13 @@ export const ProfileItem = (props: Props) => {
   const [position, setPosition] = useState({ left: 0, top: 0 });
   const [loadingCache, setLoadingCache] = useRecoilState(atomLoadingCache);
 
-  const { uid, name = "Profile", extra, updated = 0 } = itemData;
+  const { uid, name = "Profile", extra, updated = 0, option } = itemData;
 
   // local file mode
   // remote file mode
   const hasUrl = !!itemData.url;
   const hasExtra = !!extra; // only subscription url has extra info
+  // const hasOption = !!option; // only subscription url has option
   const hasHome = !!itemData.home; // only subscription url has home page
 
   const { upload = 0, download = 0, total = 0 } = extra ?? {};
@@ -62,6 +63,7 @@ export const ProfileItem = (props: Props) => {
   const description = itemData.desc;
   const expire = parseExpire(extra?.expire);
   const progress = Math.round(((download + upload) * 100) / (total + 0.1));
+  const stopUpdating = option?.stop_updating;
 
   const loading = loadingCache[itemData.uid] ?? false;
 
@@ -69,6 +71,7 @@ export const ProfileItem = (props: Props) => {
   const [, setRefresh] = useState({});
   useEffect(() => {
     if (!hasUrl) return;
+    if (stopUpdating) return;
 
     let timer: any = null;
 
